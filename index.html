@@ -1,0 +1,62 @@
+<html>
+    <head>
+        <script type="text/javascript">
+            function calculate() {
+                let desiredInclination = document.getElementById("desired_inclination").value;
+                let launchSiteLattitude = document.getElementById("launch_site_lattitude").value;
+                let finalOrbitSpeed = document.getElementById("final_orbit_speed").value;
+                let equatorialRotationSpeed = document.getElementById("equatorial_rotation_speed").value;
+
+                let resultText = "";
+
+                let azimuthInertialBody = radToDeg(Math.asin(Math.cos(degToRad(desiredInclination)) / Math.cos(degToRad(launchSiteLattitude))));
+                resultText += "<b>Azimuth (inertial body):</b> " + azimuthInertialBody + "<br/>";
+
+                let vxrot = (finalOrbitSpeed * Math.sin(degToRad(azimuthInertialBody))) - (equatorialRotationSpeed * Math.cos(degToRad(launchSiteLattitude)));
+                resultText += "<b>VxRot:</b> " + vxrot + "<br/>";
+
+                let vyrot = (finalOrbitSpeed * Math.cos(degToRad(azimuthInertialBody)));
+                resultText += "<b>VyRot:</b> " + vyrot + "<br/>";
+
+                let launchAzimuth = radToDeg(Math.atan(vxrot / vyrot));
+                resultText += "<b>Launch azimuth:</b> " + launchAzimuth + "<br/>";
+
+                let requiredDeltaV = Math.sqrt(Math.pow(vxrot, 2) + Math.pow(vyrot, 2));
+                resultText += "<b>Required Delta-V:</b> " + requiredDeltaV + "<br/>";
+
+                let savedDeltaV = finalOrbitSpeed - requiredDeltaV;
+                resultText += "<b>Delta-V you save:</b> " + savedDeltaV + "<br/>";
+
+                document.getElementById("result_text").innerHTML = resultText;
+            }
+
+            function degToRad(degrees) {
+                return degrees * Math.PI / 180;
+            }
+
+            function radToDeg(radians) {
+                return radians * 180 / Math.PI
+            }
+        </script>
+    </head>
+    <body>
+        <form>
+            <label for="desired_inclination">Desired inclination:</label><br/>
+            <input type="number" min="0" max="90" id="desired_inclination" value="51.6"/><br/>
+
+            <label for="launch_site_lattitude">Launch site lattitude:</label><br/>
+            <input type="number" min="0" max="90" id="launch_site_lattitude" value="28.5"/><br/>
+
+            <label for="final_orbit_speed">Final orbit speed:</label><br/>
+            <input type="number" id="final_orbit_speed" value="7730"/><br/>
+
+            <label for="equatorial_rotation_speed">Equatorial rotation speed</label><br/>
+            <input type="number" id="equatorial_rotation_speed" value="465"/><br/>
+
+            <hr/>
+            <input type="button" onclick="calculate();" value="Calculate azimuth"/>
+            <hr/>
+            <span id="result_text"></span>
+        </form>
+    </body>
+</html>
